@@ -1,9 +1,11 @@
-package it.gamerover.collision;
+package it.gamerover.collision.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.bukkit.entity.Player;
+
+import it.gamerover.collision.MainCollision;
 
 public class Reflections {
 
@@ -11,8 +13,11 @@ public class Reflections {
 	private static String OBCPackage = MainCollision.getInstance().getServer().getClass().getPackage().getName();
 	
 	private static Class<?> craftEntityClass = null;
+	private static Class<?> playerConnectionClass = null;
+	
 	private static Field craftEntityHandleField = null;
 	private static Field playerConnectionField = null;
+	private static Method sendPacketMethod = null;
 	
 	static {
 
@@ -23,7 +28,10 @@ public class Reflections {
 			craftEntityClass = getCraftBukkitClass("entity.CraftEntity");
 			craftEntityHandleField = getField(craftEntityClass, "entity");
 			
+			playerConnectionClass = getNMSClass("PlayerConnection");
+			
 			playerConnectionField = getField(getNMSClass("EntityPlayer"), "playerConnection");
+			sendPacketMethod = getNoParmsMethod(playerConnectionClass, "sendPacket");
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -31,7 +39,7 @@ public class Reflections {
 		
 	}	
 
-	public static <T> Method getNoParmsMethod(Class<T> searchClass, String name) throws Exception {
+	public static Method getNoParmsMethod(Class<?> searchClass, String name) throws Exception {
 		
 		for (Method method : searchClass.getMethods()) {
 			
@@ -56,7 +64,7 @@ public class Reflections {
 		
 	}
 	
-	public static <T> Method getMethod(Class<T> searchClass, String name, Class<?>... parms) throws Exception {
+	public static Method getMethod(Class<?> searchClass, String name, Class<?>... parms) throws Exception {
 
 		Method findMethod = null;
 
@@ -73,7 +81,7 @@ public class Reflections {
 
 	}
 		
-	public static <T> Field getField(Class<T> searchClass, String name) throws Exception {
+	public static Field getField(Class<?> searchClass, String name) throws Exception {
 
 		Field findField = null;
 
@@ -90,6 +98,11 @@ public class Reflections {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T getFieldValue(Field field, Object instance) throws Exception {
+		return (T) field.get(instance);
+	}
+	
 	public static Class<?> getCraftBukkitClass(String name) throws Exception {
 		return Class.forName(OBCPackage + "." + name);
 	}
@@ -99,7 +112,21 @@ public class Reflections {
 	}
 
 	/**
-	 * @return PacketPlayOutScoreboardTeam.class from net.minecraft.server.*
+	 * @return Field playerConnection of EntityPlayer class
+	 */
+	public static Field getPlayerConnectionField() {
+		return Reflections.playerConnectionField;
+	}
+	
+	/**
+	 * @return PlayerConnection class from net.minecraft.server.*
+	 */
+	public static Class<?> getPlayerConnectionClass() {
+		return Reflections.playerConnectionClass;
+	}
+	
+	/**
+	 * @return PacketPlayOutScoreboardTeam class from net.minecraft.server.*
 	 */
 	public static Class<?> getPacketTeamClass() throws Exception {
 		return getNMSClass("PacketPlayOutScoreboardTeam");
@@ -110,11 +137,13 @@ public class Reflections {
 	 */
 	public synchronized static void sendPacket(Player player, Object packetObject) throws Exception {
 		
-		Object entityPlayer = craftEntityHandleField.get(player);
-		Object connection = playerConnectionField.get(entityPlayer);
-		Method sendPacketMethod = getNoParmsMethod(connection.getClass(), "sendPacket");
+		Object connection = playerConnectionField.get(getNMSPlayer(player));
 		
 		sendPacketMethod.invoke(connection, packetObject);
+	}
+
+	public static Object getNMSPlayer(Player player) throws Exception {
+		return craftEntityHandleField.get(player);
 	}
 	
 }
