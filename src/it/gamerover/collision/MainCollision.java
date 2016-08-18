@@ -13,7 +13,7 @@ public class MainCollision extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-	
+		getServer().getPluginManager().registerEvents(new PlayerListener(), instance);
 	}
 
 	public static MainCollision getInstance() {

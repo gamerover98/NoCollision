@@ -12,6 +12,8 @@ public class PlayerListener implements Listener {
 		
 		Player player = event.getPlayer();
 		
+		TeamUtils.sendTeamPacket(player);
+		
 	}
 	
 }
