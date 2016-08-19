@@ -1,15 +1,19 @@
 package it.gamerover.collision;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import it.gamerover.collision.utils.Reflections;
+import it.gamerover.collision.tinyprotocol.Reflection;
+import it.gamerover.collision.tinyprotocol.TinyProtocol;
 
 public class TeamUtils {
 
+	private static ArrayList<Player> securePlayers = new ArrayList<Player>();
+	
 	private static Class<?> packetTeamClass = null;
 	private static Field nameField = null;
 	private static Field modeField = null;
@@ -20,12 +24,12 @@ public class TeamUtils {
 
 		try {
 
-			packetTeamClass = Reflections.getPacketTeamClass();
+			packetTeamClass = TinyProtocol.PACKET_SCOREBOARD_TEAM;
 
-			nameField = Reflections.getField(packetTeamClass, "a");
-			modeField = Reflections.getField(packetTeamClass, "i");
-			collisionRuleField = Reflections.getField(packetTeamClass, "f");
-			playersField = Reflections.getField(packetTeamClass, "h");
+			nameField = Reflection.getField(packetTeamClass, "a");
+			modeField = Reflection.getField(packetTeamClass, "i");
+			collisionRuleField = Reflection.getField(packetTeamClass, "f");
+			playersField = Reflection.getField(packetTeamClass, "h");
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -45,7 +49,9 @@ public class TeamUtils {
 
 			changePacketCollisionType(packetTeamObject);
 			
-			Reflections.sendPacket(player, packetTeamObject);
+			if (!getSecurePlayers().contains(player)) {
+				MainCollision.getCollisionProtocol().sendPacket(player, packetTeamObject);
+			}
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -61,4 +67,8 @@ public class TeamUtils {
 		return TeamUtils.packetTeamClass;
 	}
 
+	public static ArrayList<Player> getSecurePlayers() {
+		return TeamUtils.securePlayers;
+	}
+	
 }
