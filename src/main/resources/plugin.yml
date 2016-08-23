@@ -1,4 +1,4 @@
-name: NoCollision
-version: 1.2.1
+name: NoCollisions
+version: ${project.version}
 author: gamerover98
-main: it.gamerover.collision.MainCollision
+main: it.gamerover.nocollisions.NoCollisions
