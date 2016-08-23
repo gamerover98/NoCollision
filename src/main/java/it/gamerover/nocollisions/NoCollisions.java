@@ -12,10 +12,10 @@ public class NoCollisions extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		protocolManager = new ProtocolManager(this);
 		blacklist = new HashSet<>();
-		// Register listener
-		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+		// Register listeners and protocol manager
+        protocolManager = new ProtocolManager(this);
+		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 	}
 
     public boolean isInBlacklist(String name) {
@@ -31,6 +31,10 @@ public class NoCollisions extends JavaPlugin {
     }
 
     public void sendNoCollisionPacket(Player player) {
-        protocolManager.sendPacket(player, TeamPacket.generateNoCollisionsPacket(player.getName()));
+        String playername = player.getName();
+        if(isInBlacklist(playername)) {
+            return;
+        }
+        protocolManager.sendPacket(player, TeamPacket.generateNoCollisionsPacket(playername));
     }
 }

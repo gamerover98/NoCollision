@@ -1,16 +1,16 @@
 package it.gamerover.nocollisions;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-
 import com.comphenix.tinyprotocol.TinyProtocol;
+
+import io.netty.channel.Channel;
 
 public class ProtocolManager extends TinyProtocol {
     private NoCollisions plugin;
 
     public ProtocolManager(NoCollisions plugin) {
-        this.plugin = plugin;
         super(plugin);
+        this.plugin = plugin;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class ProtocolManager extends TinyProtocol {
             return packet;
         }
         TeamPacket.disableCollisions(packet);
-        plugin.addToBlacklist(reveiver.getName());
+        plugin.addToBlacklist(reciever.getName());
         return packet;
     }
 }

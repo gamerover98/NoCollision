@@ -92,6 +92,14 @@
                     <artifactId>gson</artifactId>
                     <groupId>com.google.code.gson</groupId>
                 </exclusion>
+                <exclusion>
+                	<artifactId>snakeyaml</artifactId>
+                	<groupId>org.yaml</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>commons-lang</artifactId>
+                	<groupId>commons-lang</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -99,6 +107,18 @@
             <artifactId>TinyProtocol</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>spigot-api</artifactId>
+            		<groupId>org.spigotmc</groupId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+        	<groupId>io.netty</groupId>
+        	<artifactId>netty-all</artifactId>
+        	<version>4.1.4.Final</version>
+        	<scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
