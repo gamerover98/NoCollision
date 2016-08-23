@@ -1,0 +1,4 @@
+name: NoCollisions
+version: ${project.version}
+author: gamerover98
+main: it.gamerover.nocollisions.NoCollisions
