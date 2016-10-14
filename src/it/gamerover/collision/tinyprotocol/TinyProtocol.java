@@ -8,8 +8,9 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-import it.gamerover.collision.tinyprotocol.Reflection.FieldAccessor;
-import it.gamerover.collision.tinyprotocol.Reflection.MethodInvoker;
+import it.gamerover.collision.Reflection;
+import it.gamerover.collision.Reflection.FieldAccessor;
+import it.gamerover.collision.Reflection.MethodInvoker;
 
 import java.util.Collections;
 import java.util.List;
@@ -61,8 +62,6 @@ public abstract class TinyProtocol {
 	private static final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
 	private static final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
 
-	public static final Class<?> PACKET_SCOREBOARD_TEAM = Reflection.getMinecraftClass("PacketPlayOutScoreboardTeam");
-	
 	// Speedup channel lookup
 	private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
 	private Listener listener;
@@ -176,12 +175,21 @@ public abstract class TinyProtocol {
 				if (closed)
 					return;
 
-				Channel channel = getChannel(e.getPlayer());
+				try {
+					
+					Channel channel = getChannel(e.getPlayer());
 
-				// Don't inject players that have been explicitly uninjected
-				if (!uninjectedChannels.contains(channel)) {
-					injectPlayer(e.getPlayer());
+					// Don't inject players that have been explicitly uninjected
+					if (!uninjectedChannels.contains(channel)) {
+						injectPlayer(e.getPlayer());
+					}
+					
+				} catch (NullPointerException npe) {
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
+				
+				
 			}
 
 			@EventHandler
@@ -264,7 +272,7 @@ public abstract class TinyProtocol {
 	 * @param packet - the packet being sent.
 	 * @return The packet to send instead, or NULL to cancel the transmission.
 	 */
-	public Object onPacketOutAsync(Player reciever, Channel channel, Object packet) {		
+	public Object onPacketOutAsync(Player reciever, Channel channel, Object packet) {
 		return packet;
 	}
 

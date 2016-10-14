@@ -1,4 +1,4 @@
-package it.gamerover.collision.tinyprotocol;
+package it.gamerover.collision;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

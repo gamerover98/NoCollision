@@ -3,10 +3,12 @@ package it.gamerover.collision;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import it.gamerover.collision.tinyprotocol.TinyProtocol;
+
 public class MainCollision extends JavaPlugin {
 
 	private static MainCollision instance;
-	private static CollisionProtocol collisionProtocol = null;
+	private static TinyProtocol tinyProtocol = null;
 	
 	@Override
 	public void onLoad() {
@@ -16,7 +18,7 @@ public class MainCollision extends JavaPlugin {
 	@Override
 	public void onEnable() {
 
-		collisionProtocol = new CollisionProtocol(instance);
+		tinyProtocol = new TinyProtocol(instance){};
 		getServer().getPluginManager().registerEvents(new PlayerListener(), instance);
 	}
 
@@ -29,8 +31,8 @@ public class MainCollision extends JavaPlugin {
 		return MainCollision.instance;
 	}
 
-	public static CollisionProtocol getCollisionProtocol() {
-		return collisionProtocol;
+	public static TinyProtocol getTinyProtocol() {
+		return tinyProtocol;
 	}
-
+	
 }

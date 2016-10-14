@@ -7,14 +7,11 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import it.gamerover.collision.tinyprotocol.Reflection;
-import it.gamerover.collision.tinyprotocol.TinyProtocol;
-
 public class TeamUtils {
 
 	private static ArrayList<Player> securePlayers = new ArrayList<Player>();
 	
-	private static Class<?> packetTeamClass = null;
+	private static Class<?> packetTeamClass = Reflection.getMinecraftClass("PacketPlayOutScoreboardTeam");
 	private static Field nameField = null;
 	private static Field modeField = null;
 	private static Field collisionRuleField = null;
@@ -23,8 +20,6 @@ public class TeamUtils {
 	static {
 
 		try {
-
-			packetTeamClass = TinyProtocol.PACKET_SCOREBOARD_TEAM;
 
 			nameField = Reflection.getField(packetTeamClass, "a");
 			modeField = Reflection.getField(packetTeamClass, "i");
@@ -50,7 +45,7 @@ public class TeamUtils {
 			changePacketCollisionType(packetTeamObject);
 			
 			if (!getSecurePlayers().contains(player)) {
-				MainCollision.getCollisionProtocol().sendPacket(player, packetTeamObject);
+				MainCollision.getTinyProtocol().sendPacket(player, packetTeamObject);
 			}
 
 		} catch (Exception ex) {
