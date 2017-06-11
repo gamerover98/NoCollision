@@ -7,9 +7,11 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
+import lombok.Getter;
+
 public class TeamUtils {
 
-	private static ArrayList<Player> securePlayers = new ArrayList<Player>();
+	@Getter private static ArrayList<Player> securePlayers = new ArrayList<Player>();
 	
 	private static Class<?> packetTeamClass = Reflection.getMinecraftClass("PacketPlayOutScoreboardTeam");
 	private static Field nameField = null;
@@ -62,8 +64,4 @@ public class TeamUtils {
 		return TeamUtils.packetTeamClass;
 	}
 
-	public static ArrayList<Player> getSecurePlayers() {
-		return TeamUtils.securePlayers;
-	}
-	
 }

@@ -106,7 +106,7 @@ public abstract class TinyProtocol {
 		} catch (IllegalArgumentException ex) {
 			// Damn you, late bind
 			plugin.getLogger().info("[TinyProtocol] Delaying server channel injection due to late bind.");
-			
+
 			// Damn you, late bind
 			new BukkitRunnable() {
 				@Override
@@ -151,7 +151,7 @@ public abstract class TinyProtocol {
 		};
 
 		serverChannelHandler = new ChannelInboundHandlerAdapter() {
-	
+
 			@Override
 			public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 				Channel channel = (Channel) msg;
@@ -171,25 +171,26 @@ public abstract class TinyProtocol {
 		listener = new Listener() {
 
 			@EventHandler(priority = EventPriority.LOWEST)
-			public final void onPlayerLogin(PlayerLoginEvent e) {
+			public final void onPlayerLogin(PlayerLoginEvent event) {
+				
 				if (closed)
 					return;
 
 				try {
-					
-					Channel channel = getChannel(e.getPlayer());
+
+					Channel channel = getChannel(event.getPlayer());
 
 					// Don't inject players that have been explicitly uninjected
 					if (!uninjectedChannels.contains(channel)) {
-						injectPlayer(e.getPlayer());
+						injectPlayer(event.getPlayer());
 					}
-					
+
 				} catch (NullPointerException npe) {
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-				
-				
+
+
 			}
 
 			@EventHandler
@@ -377,20 +378,45 @@ public abstract class TinyProtocol {
 	 * @return The packet interceptor.
 	 */
 	private PacketInterceptor injectChannelInternal(Channel channel) {
+
 		try {
+
 			PacketInterceptor interceptor = (PacketInterceptor) channel.pipeline().get(handlerName);
 
 			// Inject our packet interceptor
 			if (interceptor == null) {
+
 				interceptor = new PacketInterceptor();
-				channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
+				boolean found = false;
+				
+				for (String name : channel.pipeline().names()) {
+
+					if (name.equals("packet_handler")) {
+						
+						found = true;
+						channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
+						break;
+						
+					}
+
+				}
+				
+				if (!found) {
+					channel.pipeline().addBefore("BukkitChannelInitializer#0", handlerName, interceptor);
+				}
+
+
 				uninjectedChannels.remove(channel);
+
 			}
 
 			return interceptor;
+
 		} catch (IllegalArgumentException e) {
+
 			// Try again
 			return (PacketInterceptor) channel.pipeline().get(handlerName);
+
 		}
 	}
 
