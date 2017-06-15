@@ -387,15 +387,10 @@ public abstract class TinyProtocol {
 			if (interceptor == null) {
 
 				interceptor = new PacketInterceptor();
-				String last_channel = "";
 				boolean found = false;
 				
 				for (String name : channel.pipeline().names()) {
 
-					if (last_channel.isEmpty()) {
-						last_channel = name;
-					}
-					
 					if (name.equals("packet_handler")) {
 						
 						found = true;
@@ -407,9 +402,8 @@ public abstract class TinyProtocol {
 				}
 				
 				if (!found) {
-					channel.pipeline().addBefore(last_channel, handlerName, interceptor);
+					channel.pipeline().addFirst(handlerName, interceptor);
 				}
-
 
 				uninjectedChannels.remove(channel);
 
